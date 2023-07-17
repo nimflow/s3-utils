@@ -8,7 +8,7 @@ export async function list(
   const files = [];
 
   let isTruncated = true;
-  let continuationToken: string | undefined = undefined;
+  let continuationToken: string | undefined;
 
   while (isTruncated) {
     const command = new ListObjectsV2Command({
@@ -22,7 +22,7 @@ export async function list(
     if (Array.isArray(response.Contents))
       files.push(...(response.Contents as []));
 
-    isTruncated = response.IsTruncated;
+    isTruncated = !!response.IsTruncated;
     continuationToken = response.NextContinuationToken;
   }
 
