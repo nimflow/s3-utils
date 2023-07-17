@@ -1,0 +1,26 @@
+{
+  "name": "s3-utils",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "lint": "eslint . --ext .ts",
+    "build": "tsc",
+    "start": "yarn build && node build/index.js"
+  },
+  "keywords": [],
+  "author": "FR",
+  "license": "ISC",
+  "dependencies": {
+    "@aws-sdk/client-s3": "^3.370.0",
+    "dotenv": "^16.3.1"
+  },
+  "type": "module",
+  "devDependencies": {
+    "@types/node": "^20.4.2",
+    "@typescript-eslint/eslint-plugin": "^6.0.0",
+    "@typescript-eslint/parser": "^6.0.0",
+    "eslint": "^8.45.0",
+    "typescript": "^5.1.6"
+  }
+}
