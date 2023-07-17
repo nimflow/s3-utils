@@ -3,7 +3,7 @@ import { S3Client, ListObjectsV2Command } from "@aws-sdk/client-s3";
 export async function list(
   client: S3Client,
   bucketName: string,
-  prefix: string
+  prefix?: string
 ) {
   const files = [];
 

@@ -4,6 +4,7 @@ import { list } from "./s3-utils.js";
 
 async function main() {
   const bucketName = process.env.S3_BUCKET_NAME;
+  const prefix = process.env.S3_CONTAINER_NAME_PREFIX;
 
   console.log({ bucketName });
 
@@ -15,7 +16,7 @@ async function main() {
     region: process.env.S3_REGION,
   });
 
-  const result = await list(client, bucketName!, "test");
+  const result = await list(client, bucketName!, prefix);
   console.log(result);
 }
 
