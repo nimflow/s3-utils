@@ -1,23 +1,57 @@
 import "dotenv/config";
 import { S3Client } from "@aws-sdk/client-s3";
-import { list } from "./s3-utils.js";
+import { deleteFiles, iterate } from "./s3-utils.js";
 
-async function main() {
-  const bucketName = process.env.S3_BUCKET_NAME;
-  const prefix = process.env.S3_CONTAINER_NAME_PREFIX;
+const bucketName = process.env.S3_BUCKET_NAME;
+const prefix = process.env.S3_CONTAINER_NAME_PREFIX;
+const accessKeyId = process.env.S3_ACCESS_KEY;
+const secretAccessKey = process.env.S3_SECRET_KEY;
 
-  console.log(`Listing bucket ${bucketName} with prefix ${prefix}`);
+if (!bucketName) throw new Error("S3_BUCKET_NAME is not defined");
+if (!accessKeyId) throw new Error("S3_ACCESS_KEY is not defined");
+if (!secretAccessKey) throw new Error("S3_SECRET_KEY is not defined");
 
-  const client = new S3Client({
-    credentials: {
-      accessKeyId: process.env.S3_ACCESS_KEY!,
-      secretAccessKey: process.env.S3_SECRET_KEY!,
-    },
-    region: process.env.S3_REGION,
+const client = new S3Client({
+  credentials: {
+    accessKeyId,
+    secretAccessKey,
+  },
+  region: process.env.S3_REGION,
+});
+
+//Si no es = undefined, se filtra por aquellos archivos que hayan sido modificados antes de la fecha indicada
+const modifiedBefore = new Date("2022-10-21");
+//Si no es = undefined, se filtra por aquellos archivos cuyo key cumpla con la expresión regular
+const filterExpression = /_\d+\.tiff$/;
+//Si no es = undefined, se limita la cantidad de lotes de archivos a procesar. Cada lote tiene un máximo definido por S3 de 1000 archivos
+const batchLimit = 1;
+
+const listS3Files = async () =>
+  iterate({
+    client,
+    bucketName,
+    prefix,
+    filterExpression,
+    modifiedBefore,
+    batchLimit,
+    action: async (files) => console.log(files),
   });
 
-  const result = await list(client, bucketName!, prefix);
-  console.log(result);
-}
+const deleteS3Files = async () =>
+  iterate({
+    client,
+    bucketName,
+    prefix,
+    filterExpression,
+    modifiedBefore,
+    batchLimit,
+    action: async (files) =>
+      deleteFiles({
+        client,
+        files,
+        bucketName,
+      }),
+  });
 
-main();
+listS3Files();
+//deleteS3Files();
