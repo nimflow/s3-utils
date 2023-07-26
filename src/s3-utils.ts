@@ -3,11 +3,12 @@ import {
   ListObjectsV2Command,
   DeleteObjectCommand,
   _Object,
+  PutObjectCommand,
 } from "@aws-sdk/client-s3";
 
 type IterateProps = {
   client: S3Client;
-  bucketName: string;
+  bucket: string;
   prefix?: string;
   filterExpression?: RegExp;
   modifiedBefore?: Date;
@@ -18,7 +19,7 @@ type IterateProps = {
 export async function iterate(props: IterateProps) {
   const {
     client,
-    bucketName,
+    bucket,
     prefix,
     action,
     filterExpression,
@@ -31,7 +32,7 @@ export async function iterate(props: IterateProps) {
 
   while (isTruncated) {
     const command = new ListObjectsV2Command({
-      Bucket: bucketName,
+      Bucket: bucket,
       Prefix: prefix,
       ContinuationToken: continuationToken,
     });
@@ -65,20 +66,43 @@ export async function iterate(props: IterateProps) {
 
 type DeleteFilesProps = {
   client: S3Client;
-  bucketName: string;
+  bucket: string;
   files: _Object[];
 };
 
 export async function deleteFiles(props: DeleteFilesProps) {
-  const { client, files, bucketName } = props;
+  const { client, files, bucket } = props;
 
   for (const file of files) {
     const command = new DeleteObjectCommand({
-      Bucket: bucketName,
+      Bucket: bucket,
       Key: file.Key,
     });
 
     await client.send(command);
     console.log(`Deleted ${file.Key}`);
+  }
+}
+
+export async function createTestFiles(props: {
+  client: S3Client;
+  count: number;
+  bucket: string;
+  prefix: string;
+}) {
+  const { client, count, bucket, prefix } = props;
+  for (let i = 0; i < count; i++) {
+    const command = new PutObjectCommand({
+      Bucket: bucket,
+      Key: `${prefix}/testing_${i}.txt`,
+      Body: `${i}-${new Date().toISOString()}`,
+    });
+
+    try {
+      const response = await client.send(command);
+      console.log(response);
+    } catch (err) {
+      console.error(err);
+    }
   }
 }

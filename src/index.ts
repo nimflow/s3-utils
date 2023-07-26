@@ -1,13 +1,14 @@
+/* eslint-disable @typescript-eslint/no-unused-vars */
 import "dotenv/config";
 import { S3Client } from "@aws-sdk/client-s3";
-import { deleteFiles, iterate } from "./s3-utils.js";
+import { createTestFiles, deleteFiles, iterate } from "./s3-utils.js";
 
-const bucketName = process.env.S3_BUCKET_NAME;
+const bucket = process.env.S3_BUCKET_NAME;
 const prefix = process.env.S3_CONTAINER_NAME_PREFIX;
 const accessKeyId = process.env.S3_ACCESS_KEY;
 const secretAccessKey = process.env.S3_SECRET_KEY;
 
-if (!bucketName) throw new Error("S3_BUCKET_NAME is not defined");
+if (!bucket) throw new Error("S3_BUCKET_NAME is not defined");
 if (!accessKeyId) throw new Error("S3_ACCESS_KEY is not defined");
 if (!secretAccessKey) throw new Error("S3_SECRET_KEY is not defined");
 
@@ -29,7 +30,7 @@ const batchLimit = 1;
 const listS3Files = async () =>
   iterate({
     client,
-    bucketName,
+    bucket,
     prefix,
     filterExpression,
     modifiedBefore,
@@ -40,7 +41,7 @@ const listS3Files = async () =>
 const deleteS3Files = async () =>
   iterate({
     client,
-    bucketName,
+    bucket: bucket,
     prefix,
     filterExpression,
     modifiedBefore,
@@ -49,9 +50,26 @@ const deleteS3Files = async () =>
       deleteFiles({
         client,
         files,
-        bucketName,
+        bucket,
       }),
   });
+
+const deleteTestFiles = async () =>
+  iterate({
+    client,
+    bucket: bucket,
+    prefix: `${prefix}/testingUtils`,
+    filterExpression: /_\d+\.txt$/,
+    action: async (files) => deleteFiles({ client, files, bucket }),
+  });
+
+// createTestFiles({
+//   client,
+//   count: 1100,
+//   bucket: bucket,
+//   prefix: `${prefix}/testingUtils`,
+// });
+//deleteTestFiles();
 
 listS3Files();
 //deleteS3Files();
