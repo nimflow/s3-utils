@@ -7,7 +7,7 @@ const bucket = process.env.S3_BUCKET_NAME;
 const prefix = process.env.S3_CONTAINER_NAME_PREFIX;
 const accessKeyId = process.env.S3_ACCESS_KEY;
 const secretAccessKey = process.env.S3_SECRET_KEY;
-const endpoint = process.env.S3_SECRET_KEY;
+const endpoint = process.env.S3_ENDPOINT;
 
 if (!bucket) throw new Error("S3_BUCKET_NAME is not defined");
 if (!accessKeyId) throw new Error("S3_ACCESS_KEY is not defined");
