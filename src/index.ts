@@ -7,6 +7,7 @@ const bucket = process.env.S3_BUCKET_NAME;
 const prefix = process.env.S3_CONTAINER_NAME_PREFIX;
 const accessKeyId = process.env.S3_ACCESS_KEY;
 const secretAccessKey = process.env.S3_SECRET_KEY;
+const endpoint = process.env.S3_SECRET_KEY;
 
 if (!bucket) throw new Error("S3_BUCKET_NAME is not defined");
 if (!accessKeyId) throw new Error("S3_ACCESS_KEY is not defined");
@@ -18,6 +19,7 @@ const client = new S3Client({
     secretAccessKey,
   },
   region: process.env.S3_REGION,
+  endpoint,
 });
 
 //Si no es = undefined, se filtra por aquellos archivos que hayan sido modificados antes de la fecha indicada
