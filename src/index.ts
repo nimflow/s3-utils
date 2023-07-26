@@ -1,6 +1,6 @@
 /* eslint-disable @typescript-eslint/no-unused-vars */
 import "dotenv/config";
-import { S3Client } from "@aws-sdk/client-s3";
+import { S3Client, S3ClientConfig } from "@aws-sdk/client-s3";
 import { createTestFiles, deleteFiles, iterate } from "./s3-utils.js";
 
 const bucket = process.env.S3_BUCKET_NAME;
@@ -13,14 +13,17 @@ if (!bucket) throw new Error("S3_BUCKET_NAME is not defined");
 if (!accessKeyId) throw new Error("S3_ACCESS_KEY is not defined");
 if (!secretAccessKey) throw new Error("S3_SECRET_KEY is not defined");
 
-const client = new S3Client({
+const options: S3ClientConfig = {
   credentials: {
     accessKeyId,
     secretAccessKey,
   },
   region: process.env.S3_REGION,
+  forcePathStyle: true,
   endpoint,
-});
+};
+
+const client = new S3Client(options);
 
 //Si no es = undefined, se filtra por aquellos archivos que hayan sido modificados antes de la fecha indicada
 const modifiedBefore = new Date("2022-10-21");
@@ -67,7 +70,7 @@ const deleteTestFiles = async () =>
 
 // createTestFiles({
 //   client,
-//   count: 1100,
+//   count: 10,
 //   bucket: bucket,
 //   prefix: `${prefix}/testingUtils`,
 // });
