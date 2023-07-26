@@ -6,7 +6,7 @@ import {
   PutObjectCommand,
 } from "@aws-sdk/client-s3";
 
-type IterateProps = {
+export async function iterate(props: {
   client: S3Client;
   bucket: string;
   prefix?: string;
@@ -14,9 +14,7 @@ type IterateProps = {
   modifiedBefore?: Date;
   batchLimit?: number;
   action: (files: _Object[]) => Promise<void>;
-};
-
-export async function iterate(props: IterateProps) {
+}) {
   const {
     client,
     bucket,
@@ -64,13 +62,11 @@ export async function iterate(props: IterateProps) {
   }
 }
 
-type DeleteFilesProps = {
+export async function deleteFiles(props: {
   client: S3Client;
   bucket: string;
   files: _Object[];
-};
-
-export async function deleteFiles(props: DeleteFilesProps) {
+}) {
   const { client, files, bucket } = props;
 
   for (const file of files) {
